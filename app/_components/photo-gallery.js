@@ -56,7 +56,7 @@ export default async function PhotoGallery({ count = 12 }) {
             >
               <img
                 src={t.image.card}
-                alt=""
+                alt={t.image.alt || ''}
                 loading="lazy"
               />
             </a>

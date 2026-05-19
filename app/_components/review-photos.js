@@ -66,7 +66,7 @@ export default function ReviewPhotos({ images, reviewer }) {
           >
             <img
               src={img.thumb}
-              alt=""
+              alt={img.alt || ''}
               loading="lazy"
               style={{
                 width: '100%',
@@ -176,7 +176,7 @@ export default function ReviewPhotos({ images, reviewer }) {
           ) : null}
           <img
             src={images[openIndex].full}
-            alt=""
+            alt={images[openIndex].alt || ''}
             onClick={(e) => e.stopPropagation()}
             style={{
               maxWidth: '90vw',
