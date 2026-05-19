@@ -639,6 +639,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   text-decoration: none !important;
 }
 
+/* --- Comparison page: ingredient notes + test callout --- */
+@media (max-width: 720px) {
+  .ingredient-notes-grid { grid-template-columns: 1fr !important; gap: 18px !important; }
+  .testbed-callout { grid-template-columns: 1fr !important; }
+  .testbed-callout .btn { width: 100%; justify-content: center; }
+}
+
 /* --- Filter chips --- */
 .filter-chips {
   display: flex;

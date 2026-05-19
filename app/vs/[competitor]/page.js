@@ -1,5 +1,5 @@
 // app/vs/[competitor]/page.js
-const { competitors } = require('../../../lib/competitors');
+const { competitors, BUILDASOIL_3_INGREDIENTS } = require('../../../lib/competitors');
 const { getSiteStats, rows } = require('../../../lib/db');
 
 export async function generateStaticParams() {
@@ -231,21 +231,21 @@ export default async function VsPage({ params }) {
               padding: 28,
             }}
           >
-            <h4 style={{ marginBottom: 16, color: 'var(--leaf)' }}>BuildASoil</h4>
-            <p style={{ color: 'var(--ink-soft)', fontSize: '0.92rem', lineHeight: 1.65 }}>
-              BuildASoil&apos;s flagship Potting Soil Recipe 3.0 contains: aged Canadian
-              sphagnum peat moss, rice hulls (aeration), worm castings, BuildASoil Craft
-              Blend (multi-amendment nutrient pack), kelp meal, neem &amp; karanja meal,
-              crab meal, gypsum, basalt, glacial rock dust, oyster shell flour, biochar,
-              and mycorrhizal fungi.
-            </p>
+            <h4 style={{ marginBottom: 16, color: 'var(--leaf)' }}>
+              BuildASoil Potting Soil Recipe 3.0
+            </h4>
+            <ul style={{ paddingLeft: 18, color: 'var(--ink-soft)', fontSize: '0.92rem', lineHeight: 1.7 }}>
+              {BUILDASOIL_3_INGREDIENTS.map((ing) => (
+                <li key={ing}>{ing}</li>
+              ))}
+            </ul>
             <p style={{
               color: 'var(--ink-mute)',
               fontSize: '0.82rem',
               marginTop: 12,
               fontStyle: 'italic',
             }}>
-              See current ingredients on{' '}
+              See latest formulation on{' '}
               <a href="https://buildasoil.com/products/buildasoil-premium-potting-soil-version-3-0" style={{ color: 'var(--leaf)' }}>
                 buildasoil.com
               </a>
@@ -266,6 +266,121 @@ export default async function VsPage({ params }) {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      {/* ---- Ingredient quality breakdown ---- */}
+      {Array.isArray(c.ingredientNotes) && c.ingredientNotes.length > 0 ? (
+        <section className="container">
+          <h2 style={{ marginBottom: 8 }}>How the ingredients actually compare</h2>
+          <p style={{ color: 'var(--ink-mute)', marginBottom: 32, fontSize: '0.95rem', maxWidth: 760 }}>
+            Ingredient lists are similar at a glance — but the specific choices have
+            real consequences for soil longevity, environmental impact, and how the
+            soil performs over multiple grows. Here&apos;s the breakdown.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 56 }}>
+            {c.ingredientNotes.map((note, i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'var(--bg-paper)',
+                  border: '1px solid var(--line)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '24px 28px',
+                }}
+              >
+                <h4 style={{ marginBottom: 14, fontSize: '1.1rem' }}>{note.topic}</h4>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 24,
+                  }}
+                  className="ingredient-notes-grid"
+                >
+                  <div>
+                    <div style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--soil)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      fontWeight: 600,
+                      marginBottom: 6,
+                    }}>
+                      {c.name}
+                    </div>
+                    <p style={{ color: 'var(--ink-soft)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                      {note.their}
+                    </p>
+                  </div>
+                  <div>
+                    <div style={{
+                      fontSize: '0.78rem',
+                      color: 'var(--leaf)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      fontWeight: 600,
+                      marginBottom: 6,
+                    }}>
+                      BuildASoil 3.0
+                    </div>
+                    <p style={{ color: 'var(--ink-soft)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                      {note.ours}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* ---- 26-bag test callout ---- */}
+      <section className="container">
+        <div
+          style={{
+            background: 'var(--cream)',
+            border: '1px solid var(--line)',
+            borderLeft: '4px solid var(--rust)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '32px 36px',
+            marginBottom: 56,
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            gap: 24,
+            alignItems: 'center',
+          }}
+          className="testbed-callout"
+        >
+          <div>
+            <div style={{
+              fontSize: '0.78rem',
+              color: 'var(--soil)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              fontWeight: 600,
+              marginBottom: 8,
+            }}>
+              See the side-by-side proof
+            </div>
+            <h3 style={{ marginBottom: 10, fontSize: '1.5rem' }}>
+              We tested BuildASoil against 26 other bagged soils — including {c.name}.
+            </h3>
+            <p style={{ color: 'var(--ink-soft)', lineHeight: 1.6 }}>
+              A real, documented head-to-head grow test comparing BuildASoil 3.0 against
+              26 commercial bagged soils, including Fox Farm Ocean Forest, Happy Frog,
+              Roots Organics, and others. See the photos and results yourself.
+            </p>
+          </div>
+          <a
+            href="https://buildasoil.com/pages/why-buildasoil"
+            target="_blank"
+            rel="noopener"
+            className="btn"
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            View the 26-bag test →
+          </a>
         </div>
       </section>
 
