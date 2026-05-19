@@ -1,6 +1,7 @@
 // app/page.js
 const { rows, getSiteStats } = require('../lib/db');
 const { slugify } = require('../lib/db');
+const { getActiveProductTitlesSet, normalizeName } = require('../lib/shopify');
 import PlatformsSection from './_components/platforms-section';
 
 function StarString({ rating }) {
@@ -11,15 +12,21 @@ function StarString({ rating }) {
 export default async function HomePage() {
   const stats = await getSiteStats();
 
-  // Top products by review count
-  const topProducts = await rows(`
+  // Top products by review count — pull more than we need, then filter to active
+  const allTopProducts = await rows(`
     SELECT product_name, COUNT(*) AS c, AVG(rating) AS avg_r
     FROM reviews
     WHERE product_name IS NOT NULL
     GROUP BY product_name
     ORDER BY c DESC
-    LIMIT 9
+    LIMIT 30
   `);
+
+  const activeSet = await getActiveProductTitlesSet();
+  const topProducts = (activeSet
+    ? allTopProducts.filter((p) => activeSet.has(normalizeName(p.product_name)))
+    : allTopProducts
+  ).slice(0, 9);
 
   // Recent 5-star reviews for "wall of love" preview
   const recent = await rows(`

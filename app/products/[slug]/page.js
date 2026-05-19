@@ -1,20 +1,13 @@
 // app/products/[slug]/page.js
 const { rows, scalar, slugify } = require('../../../lib/db');
+const { getActiveProductMap, normalizeName } = require('../../../lib/shopify');
+
+// Allow dynamic rendering for rating filter searchParams
+export const dynamic = 'force-dynamic';
 
 function StarString({ rating }) {
   const full = Math.round(rating);
   return <span className="stars">{'★'.repeat(full)}{'☆'.repeat(5 - full)}</span>;
-}
-
-// Generate static params so every product gets a pre-rendered page
-export async function generateStaticParams() {
-  const products = await rows(`
-    SELECT product_name FROM reviews
-    WHERE product_name IS NOT NULL
-    GROUP BY product_name
-    HAVING COUNT(*) >= 3
-  `);
-  return products.map((p) => ({ slug: slugify(p.product_name) }));
 }
 
 export async function generateMetadata({ params }) {
@@ -62,6 +55,13 @@ export default async function ProductPage({ params, searchParams }) {
     );
   }
 
+  // Check if this product is currently active on Shopify
+  const activeMap = await getActiveProductMap();
+  const shopifyProduct = activeMap ? activeMap.get(normalizeName(product.product_name)) : null;
+  const isActive = !!shopifyProduct;
+  // If Shopify fetch failed entirely (activeMap is null), fail open and assume active
+  const shopifyFailed = activeMap === null;
+
   // Build review query
   const where = [`product_name = ?`, `body IS NOT NULL AND length(body) > 30`];
   const qp = [product.product_name];
@@ -85,6 +85,7 @@ export default async function ProductPage({ params, searchParams }) {
     '@type': 'Product',
     name: product.product_name,
     brand: { '@type': 'Brand', name: 'BuildASoil' },
+    ...(shopifyProduct?.url ? { url: shopifyProduct.url } : {}),
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: product.avg_r.toFixed(2),
@@ -140,6 +141,14 @@ export default async function ProductPage({ params, searchParams }) {
                 <span>·</span>
                 <span>
                   <strong>{product.with_photos.toLocaleString()}</strong> with photos
+                </span>
+              </>
+            ) : null}
+            {!isActive && !shopifyFailed ? (
+              <>
+                <span>·</span>
+                <span style={{ color: 'var(--rust)' }}>
+                  <strong>No longer in catalog</strong>
                 </span>
               </>
             ) : null}
@@ -241,15 +250,46 @@ export default async function ProductPage({ params, searchParams }) {
                 );
               })}
             </div>
-            <div className="sidebar-block">
-              <h4>Get this product</h4>
-              <p style={{ fontSize: '0.92rem', color: 'var(--ink-soft)', marginBottom: 14 }}>
-                Shop {product.product_name} directly on buildasoil.com.
-              </p>
-              <a href="https://buildasoil.com" className="btn" style={{ width: '100%', justifyContent: 'center' }}>
-                Shop on buildasoil.com →
-              </a>
-            </div>
+
+            {isActive ? (
+              <div className="sidebar-block">
+                <h4>Get this product</h4>
+                <p style={{ fontSize: '0.92rem', color: 'var(--ink-soft)', marginBottom: 14 }}>
+                  Shop {product.product_name} directly on buildasoil.com.
+                </p>
+                <a
+                  href={shopifyProduct.url}
+                  target="_blank"
+                  rel="noopener"
+                  className="btn"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Shop on buildasoil.com →
+                </a>
+                {shopifyProduct.priceMin ? (
+                  <p style={{ fontSize: '0.82rem', color: 'var(--ink-mute)', marginTop: 10, textAlign: 'center' }}>
+                    From ${shopifyProduct.priceMin.toFixed(2)}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <div className="sidebar-block" style={{ background: 'var(--cream)' }}>
+                <h4 style={{ color: 'var(--soil)' }}>No longer in catalog</h4>
+                <p style={{ fontSize: '0.92rem', color: 'var(--ink-soft)', marginBottom: 14 }}>
+                  This product is no longer available on buildasoil.com — but the
+                  reviews remain part of our public record.
+                </p>
+                <a
+                  href="https://buildasoil.com"
+                  target="_blank"
+                  rel="noopener"
+                  className="btn btn-ghost"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Browse current products →
+                </a>
+              </div>
+            )}
           </aside>
         </div>
       </section>

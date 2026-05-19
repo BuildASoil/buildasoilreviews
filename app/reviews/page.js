@@ -1,6 +1,9 @@
 // app/reviews/page.js
 const { rows, scalar, getSiteStats, slugify } = require('../../lib/db');
 
+// Force dynamic rendering — this page reads search params on every request
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'All BuildASoil Reviews — Searchable Database of 27,000+ Verified Reviews',
   description:

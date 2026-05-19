@@ -1,6 +1,7 @@
 // app/sitemap.js
 const { rows, slugify } = require('../lib/db');
 const { competitors } = require('../lib/competitors');
+const { getActiveProductTitlesSet, normalizeName } = require('../lib/shopify');
 
 export default async function sitemap() {
   const base = 'https://www.buildasoilreviews.com';
@@ -12,7 +13,13 @@ export default async function sitemap() {
     GROUP BY product_name HAVING COUNT(*) >= 3
   `);
 
-  const productUrls = products.map((p) => ({
+  // Filter to only active Shopify products (so we don't serve dead links to search engines)
+  const activeSet = await getActiveProductTitlesSet();
+  const filteredProducts = activeSet
+    ? products.filter((p) => activeSet.has(normalizeName(p.product_name)))
+    : products;
+
+  const productUrls = filteredProducts.map((p) => ({
     url: `${base}/products/${slugify(p.product_name)}`,
     lastModified: p.last_review ? new Date(p.last_review) : new Date(),
     changeFrequency: 'weekly',

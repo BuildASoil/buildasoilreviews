@@ -1,5 +1,6 @@
 // app/faq/page.js
 const { rows, scalar, getSiteStats } = require('../../lib/db');
+const { getActiveProducts } = require('../../lib/shopify');
 
 export const metadata = {
   title: 'BuildASoil FAQ — Answers Synthesized from 27,000+ Customer Reviews',
@@ -9,6 +10,8 @@ export const metadata = {
 
 export default async function FAQPage() {
   const stats = await getSiteStats();
+  const activeProducts = await getActiveProducts();
+  const activeCount = activeProducts ? activeProducts.length : null;
 
   // Compute counts for all the FAQ data points
   const pattern = async (sql) => (await rows(sql))[0]?.c || 0;
@@ -160,9 +163,22 @@ export default async function FAQPage() {
           BuildASoil offers organic living soil (Recipe 3.0 is the flagship), nutrient
           packs and amendments (Craft Blend, BIG 6, BuildABloom), composts and worm
           castings, beneficial microbes (Rootwise), grow equipment (lights, tents,
-          containers, watering systems), and mulches — across{' '}
-          <strong>{stats.productsTotal.toLocaleString()}</strong> reviewed products.{' '}
-          <a href="/products">Browse all products →</a>
+          containers, watering systems), and mulches.{' '}
+          {activeCount ? (
+            <>
+              The current catalog includes{' '}
+              <strong>{activeCount.toLocaleString()} active products</strong> for sale
+              on buildasoil.com, with{' '}
+              <strong>{stats.productsTotal.toLocaleString()}+ distinct products</strong>{' '}
+              reviewed across the brand&apos;s history.
+            </>
+          ) : (
+            <>
+              <strong>{stats.productsTotal.toLocaleString()}+ distinct products</strong>{' '}
+              have been reviewed across the brand&apos;s history.
+            </>
+          )}{' '}
+          <a href="/products">Browse all products with reviews →</a>
         </>
       ),
       key: 'products',

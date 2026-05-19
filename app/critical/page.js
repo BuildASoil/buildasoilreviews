@@ -1,6 +1,9 @@
 // app/critical/page.js
 const { rows, getSiteStats, slugify } = require('../../lib/db');
 
+// Force dynamic rendering — this page reads search params on every request
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'BuildASoil Critical Reviews — 1, 2, and 3-Star Reviews (Unfiltered)',
   description:
