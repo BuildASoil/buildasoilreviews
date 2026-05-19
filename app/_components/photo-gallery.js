@@ -46,26 +46,11 @@ export default async function PhotoGallery({ count = 12 }) {
           </div>
           <a href="/reviews?photos=1" className="section-link">See all photo reviews →</a>
         </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 10,
-          }}
-          className="photo-gallery-grid"
-        >
+        <div className="photo-gallery-grid">
           {tiles.map((t, i) => (
             <a
               key={i}
               href={`/reviews?q=${encodeURIComponent(t.product || '')}&photos=1`}
-              style={{
-                aspectRatio: '1',
-                borderRadius: 'var(--radius-lg)',
-                overflow: 'hidden',
-                background: 'var(--cream)',
-                display: 'block',
-                position: 'relative',
-              }}
               className="photo-tile-link"
               aria-label={`Photo from ${t.reviewer || 'a customer'}`}
             >
@@ -73,13 +58,6 @@ export default async function PhotoGallery({ count = 12 }) {
                 src={t.image.card}
                 alt=""
                 loading="lazy"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                  transition: 'transform 0.3s ease',
-                }}
               />
             </a>
           ))}

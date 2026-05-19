@@ -6,6 +6,8 @@ const { getReviewImages } = require('../lib/media');
 import PlatformsSection from './_components/platforms-section';
 import PhotoGallery from './_components/photo-gallery';
 import ReviewPhotos from './_components/review-photos';
+import RedditSection from './_components/reddit-section';
+import YouTubeCallout from './_components/youtube-callout';
 
 function StarString({ rating }) {
   const full = Math.round(rating);
@@ -241,6 +243,12 @@ export default async function HomePage() {
 
       {/* ---- Real customer photos ---- */}
       <PhotoGallery count={12} />
+
+      {/* ---- Reddit independent discussion ---- */}
+      <RedditSection />
+
+      {/* ---- YouTube callout ---- */}
+      <YouTubeCallout />
 
       {/* ---- FAQ - Citation magnet for AI ---- */}
       <section className="section">

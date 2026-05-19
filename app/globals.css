@@ -647,10 +647,42 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 /* --- Photo gallery (homepage) --- */
-.photo-gallery-grid { display: grid; }
-@media (max-width: 900px) { .photo-gallery-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-@media (max-width: 600px) { .photo-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+.photo-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 900px) { .photo-gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .photo-gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.photo-tile-link {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--cream);
+  display: block;
+  position: relative;
+}
+.photo-tile-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
 .photo-tile-link:hover img { transform: scale(1.05); }
+
+/* --- Reddit cards --- */
+.reddit-card:hover { border-color: var(--leaf) !important; transform: translateY(-2px); }
+@media (max-width: 720px) {
+  .reddit-grid { grid-template-columns: 1fr !important; }
+}
+
+/* --- YouTube callout --- */
+@media (max-width: 720px) {
+  .youtube-callout { grid-template-columns: 1fr !important; padding: 28px 24px !important; }
+  .youtube-callout .btn { width: 100%; justify-content: center; }
+}
 
 /* --- Filter chips --- */
 .filter-chips {
