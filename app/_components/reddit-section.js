@@ -5,6 +5,14 @@
 
 const REDDIT_THREADS = [
   {
+    subreddit: 'r/BuildASoil',
+    title: 'Dedicated grower community — 2.1K weekly visitors',
+    summary:
+      'A fan-run subreddit running since 2021, dedicated to BuildASoil products and techniques. Growers share automated setups, in-depth tutorials, harvest photos, and ask each other questions about Recipe 3.0, Craft Blend, no-till methods, and the broader BuildASoil ecosystem.',
+    url: 'https://www.reddit.com/r/BuildASoil/',
+    sentiment: 'Active community',
+  },
+  {
     subreddit: 'r/NoTillGrowery',
     title: 'Long-time growers debate price vs ingredient quality',
     summary:
@@ -19,14 +27,6 @@ const REDDIT_THREADS = [
       'On a 280-upvote living-soil grow showcase, a commenter recommends BuildASoil to a stranger asking how to replicate the results — citing personal experience switching to big pots and living soil from the BuildASoil playbook.',
     url: 'https://www.reddit.com/r/microgrowery/comments/1eyt7j6/5x5_single_plant_late_flower_update/',
     sentiment: 'Recommended by grower',
-  },
-  {
-    subreddit: 'rollitup.org',
-    title: 'Kis Organics vs BuildASoil community discussion',
-    summary:
-      'A long-form community thread comparing the two leading living-soil providers. Includes ingredient-level breakdowns, price-per-cubic-foot analysis, and real grow results from people who have used both.',
-    url: 'https://www.rollitup.org/t/kis-organics-vs-buildasoil-please-share-your-thoughts-and-experiences-with-them.978753',
-    sentiment: 'Honest comparison',
   },
   {
     subreddit: 'rollitup.org',
