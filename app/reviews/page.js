@@ -1,5 +1,7 @@
 // app/reviews/page.js
 const { rows, scalar, getSiteStats, slugify } = require('../../lib/db');
+const { getReviewImages } = require('../../lib/media');
+import ReviewPhotos from '../_components/review-photos';
 
 // Force dynamic rendering — this page reads search params on every request
 export const dynamic = 'force-dynamic';
@@ -48,7 +50,7 @@ export default async function ReviewsPage({ searchParams }) {
   // Fetch page
   const offset = (page - 1) * PER_PAGE;
   const reviewsList = await rows(
-    `SELECT reviewer_name, product_name, body, rating, date_created, is_verified, has_media, reply_body
+    `SELECT reviewer_name, product_name, body, rating, date_created, is_verified, has_media, reply_body, media_json
      FROM reviews ${whereSql}
      ORDER BY date_created DESC
      LIMIT ${PER_PAGE} OFFSET ${offset}`,
@@ -125,32 +127,36 @@ export default async function ReviewsPage({ searchParams }) {
               No reviews match those filters. Try clearing them or searching for something else.
             </p>
           ) : (
-            reviewsList.map((r, i) => (
-              <div key={i} className="review-card">
-                <div className="review-head">
-                  <div>
-                    <div className="reviewer">{r.reviewer_name || 'Verified buyer'}</div>
-                    <div className="review-meta">
-                      <StarString rating={r.rating} />
-                      {r.is_verified ? <span className="verified-tag">Verified</span> : null}
-                      <span>{new Date(r.date_created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            reviewsList.map((r, i) => {
+              const photos = getReviewImages(r);
+              return (
+                <div key={i} className="review-card">
+                  <div className="review-head">
+                    <div>
+                      <div className="reviewer">{r.reviewer_name || 'Verified buyer'}</div>
+                      <div className="review-meta">
+                        <StarString rating={r.rating} />
+                        {r.is_verified ? <span className="verified-tag">Verified</span> : null}
+                        <span>{new Date(r.date_created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
                     </div>
                   </div>
+                  <div className="review-body">{r.body}</div>
+                  {photos.length > 0 ? <ReviewPhotos images={photos} reviewer={r.reviewer_name} /> : null}
+                  {r.product_name ? (
+                    <a href={`/products/${slugify(r.product_name)}`} className="review-product">
+                      on {r.product_name} →
+                    </a>
+                  ) : null}
+                  {r.reply_body ? (
+                    <div className="review-reply">
+                      <div className="reply-from">Reply from BuildASoil</div>
+                      {r.reply_body}
+                    </div>
+                  ) : null}
                 </div>
-                <div className="review-body">{r.body}</div>
-                {r.product_name ? (
-                  <a href={`/products/${slugify(r.product_name)}`} className="review-product">
-                    on {r.product_name} →
-                  </a>
-                ) : null}
-                {r.reply_body ? (
-                  <div className="review-reply">
-                    <div className="reply-from">Reply from BuildASoil</div>
-                    {r.reply_body}
-                  </div>
-                ) : null}
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

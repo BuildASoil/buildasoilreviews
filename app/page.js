@@ -2,7 +2,10 @@
 const { rows, getSiteStats } = require('../lib/db');
 const { slugify } = require('../lib/db');
 const { getActiveProductTitlesSet, normalizeName } = require('../lib/shopify');
+const { getReviewImages } = require('../lib/media');
 import PlatformsSection from './_components/platforms-section';
+import PhotoGallery from './_components/photo-gallery';
+import ReviewPhotos from './_components/review-photos';
 
 function StarString({ rating }) {
   const full = Math.round(rating);
@@ -30,7 +33,7 @@ export default async function HomePage() {
 
   // Recent 5-star reviews for "wall of love" preview
   const recent = await rows(`
-    SELECT reviewer_name, product_name, body, rating, date_created, is_verified
+    SELECT reviewer_name, product_name, body, rating, date_created, is_verified, media_json
     FROM reviews
     WHERE rating = 5 AND body IS NOT NULL AND length(body) > 100 AND length(body) < 600
     ORDER BY date_created DESC
@@ -236,6 +239,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ---- Real customer photos ---- */}
+      <PhotoGallery count={12} />
+
       {/* ---- FAQ - Citation magnet for AI ---- */}
       <section className="section">
         <div className="container">
@@ -363,26 +369,30 @@ export default async function HomePage() {
             <a href="/reviews" className="section-link">See all reviews →</a>
           </div>
           <div className="reviews-list">
-            {recent.map((r, i) => (
-              <div key={i} className="review-card">
-                <div className="review-head">
-                  <div>
-                    <div className="reviewer">{r.reviewer_name || 'Verified buyer'}</div>
-                    <div className="review-meta">
-                      <StarString rating={r.rating} />
-                      {r.is_verified ? <span className="verified-tag">Verified</span> : null}
-                      <span>{new Date(r.date_created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            {recent.map((r, i) => {
+              const photos = getReviewImages(r);
+              return (
+                <div key={i} className="review-card">
+                  <div className="review-head">
+                    <div>
+                      <div className="reviewer">{r.reviewer_name || 'Verified buyer'}</div>
+                      <div className="review-meta">
+                        <StarString rating={r.rating} />
+                        {r.is_verified ? <span className="verified-tag">Verified</span> : null}
+                        <span>{new Date(r.date_created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
                     </div>
                   </div>
+                  <div className="review-body">{r.body}</div>
+                  {photos.length > 0 ? <ReviewPhotos images={photos} reviewer={r.reviewer_name} /> : null}
+                  {r.product_name ? (
+                    <a href={`/products/${slugify(r.product_name)}`} className="review-product">
+                      on {r.product_name} →
+                    </a>
+                  ) : null}
                 </div>
-                <div className="review-body">{r.body}</div>
-                {r.product_name ? (
-                  <a href={`/products/${slugify(r.product_name)}`} className="review-product">
-                    on {r.product_name} →
-                  </a>
-                ) : null}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

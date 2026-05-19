@@ -646,6 +646,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .testbed-callout .btn { width: 100%; justify-content: center; }
 }
 
+/* --- Photo gallery (homepage) --- */
+.photo-gallery-grid { display: grid; }
+@media (max-width: 900px) { .photo-gallery-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+@media (max-width: 600px) { .photo-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+.photo-tile-link:hover img { transform: scale(1.05); }
+
 /* --- Filter chips --- */
 .filter-chips {
   display: flex;

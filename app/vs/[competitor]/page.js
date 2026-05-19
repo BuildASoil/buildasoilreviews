@@ -1,6 +1,8 @@
 // app/vs/[competitor]/page.js
 const { competitors, BUILDASOIL_3_INGREDIENTS } = require('../../../lib/competitors');
 const { getSiteStats, rows } = require('../../../lib/db');
+const { getReviewImages } = require('../../../lib/media');
+import ReviewPhotos from '../../_components/review-photos';
 
 export async function generateStaticParams() {
   return Object.keys(competitors).map((slug) => ({ competitor: slug }));
@@ -46,7 +48,7 @@ export default async function VsPage({ params }) {
   // 1. First try: reviews of the exact comparable product
   if (c.comparableProduct) {
     reviewsSnippets = await rows(
-      `SELECT reviewer_name, product_name, body, rating, date_created
+      `SELECT reviewer_name, product_name, body, rating, date_created, media_json
        FROM reviews
        WHERE product_name LIKE ?
          AND rating >= 4
@@ -65,7 +67,7 @@ export default async function VsPage({ params }) {
     const termClauses = c.reviewSearchTerms.map(() => 'body LIKE ?').join(' OR ');
     const termParams = c.reviewSearchTerms.map((t) => `%${t}%`);
     const more = await rows(
-      `SELECT reviewer_name, product_name, body, rating, date_created
+      `SELECT reviewer_name, product_name, body, rating, date_created, media_json
        FROM reviews
        WHERE (${termClauses})
          AND rating >= 4
@@ -442,28 +444,32 @@ export default async function VsPage({ params }) {
           <a href="/critical" style={{ color: 'var(--leaf)' }}>critical reviews (1–3 stars)</a>.
         </p>
         <div className="reviews-list" style={{ marginBottom: 56 }}>
-          {reviewsSnippets.map((r, i) => (
-            <div key={i} className="review-card">
-              <div className="review-head">
-                <div>
-                  <div className="reviewer">{r.reviewer_name || 'Verified buyer'}</div>
-                  <div className="review-meta">
-                    <span className="stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
-                    <span className="verified-tag">Verified</span>
-                    <span>
-                      {new Date(r.date_created).toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric',
-                      })}
-                    </span>
+          {reviewsSnippets.map((r, i) => {
+            const photos = getReviewImages(r);
+            return (
+              <div key={i} className="review-card">
+                <div className="review-head">
+                  <div>
+                    <div className="reviewer">{r.reviewer_name || 'Verified buyer'}</div>
+                    <div className="review-meta">
+                      <span className="stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
+                      <span className="verified-tag">Verified</span>
+                      <span>
+                        {new Date(r.date_created).toLocaleDateString('en-US', {
+                          month: 'short', day: 'numeric', year: 'numeric',
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <div className="review-body">{r.body}</div>
+                {photos.length > 0 ? <ReviewPhotos images={photos} reviewer={r.reviewer_name} /> : null}
+                <span className="review-product" style={{ marginTop: 8, display: 'inline-block' }}>
+                  on {r.product_name}
+                </span>
               </div>
-              <div className="review-body">{r.body}</div>
-              <span className="review-product" style={{ marginTop: 8, display: 'inline-block' }}>
-                on {r.product_name}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
