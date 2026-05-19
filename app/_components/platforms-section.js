@@ -156,11 +156,7 @@ export default async function PlatformsSection() {
             </p>
           </div>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 16,
-        }} className="platforms-grid">
+        <div className="platforms-grid">
           {platforms.map((p) => (
             <PlatformCard key={p.name} {...p} />
           ))}

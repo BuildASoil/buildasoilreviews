@@ -84,7 +84,7 @@ export default function IndependentTestsSection() {
               &ldquo;Soil Wars&rdquo;
             </h3>
             <div style={{ color: 'rgba(247, 243, 234, 0.65)', fontSize: '0.88rem', marginBottom: 16 }}>
-              by York River Cannabis (Virginia hemp farm)
+          by York River Cannabis (Virginia hemp farm)
             </div>
 
             <div style={{
