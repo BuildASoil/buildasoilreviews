@@ -10,9 +10,10 @@ export async function generateMetadata({ params }) {
   const { competitor } = await params;
   const c = competitors[competitor];
   if (!c) return { title: 'Comparison not found' };
+  const productLabel = c.comparableProduct || 'BuildASoil';
   return {
-    title: `BuildASoil vs ${c.name} — Honest Comparison (Backed by Real Reviews)`,
-    description: `Side-by-side comparison of BuildASoil and ${c.name}: ingredients, philosophy, price, and which is better for which grower. Backed by 27,000+ verified BuildASoil customer reviews.`,
+    title: `${productLabel} vs ${c.name} — Honest Comparison (Backed by Real Reviews)`,
+    description: `Side-by-side comparison of ${productLabel} and ${c.name}: ingredients, philosophy, price, and which is better for which grower. Backed by 27,000+ verified BuildASoil customer reviews.`,
   };
 }
 
@@ -33,18 +34,59 @@ export default async function VsPage({ params }) {
 
   const stats = await getSiteStats();
 
-  // Pull a few high-quality reviews to back up BuildASoil's case
-  const reviewsSnippets = await rows(`
-    SELECT reviewer_name, product_name, body, rating, date_created
-    FROM reviews
-    WHERE rating = 5
-      AND body IS NOT NULL
-      AND length(body) > 120
-      AND length(body) < 500
-      AND is_verified = 1
-    ORDER BY RANDOM()
-    LIMIT 3
-  `);
+  // Pull reviews that are RELEVANT to this specific comparison.
+  // Strategy: prefer reviews of the comparable product, but if there aren't
+  // enough substantive ones, fall back to broader living-soil related reviews.
+  // We use the competitor slug as a deterministic offset so each comparison
+  // page shows different reviews (stable, not random).
+  const slugSeed = competitor.length; // simple stable offset per page
+
+  let reviewsSnippets = [];
+
+  // 1. First try: reviews of the exact comparable product
+  if (c.comparableProduct) {
+    reviewsSnippets = await rows(
+      `SELECT reviewer_name, product_name, body, rating, date_created
+       FROM reviews
+       WHERE product_name LIKE ?
+         AND rating >= 4
+         AND body IS NOT NULL
+         AND length(body) > 120
+         AND length(body) < 600
+         AND is_verified = 1
+       ORDER BY rating DESC, length(body) DESC
+       LIMIT 10 OFFSET ?`,
+      [`%${c.comparableProduct.replace('BuildASoil ', '')}%`, slugSeed % 5]
+    );
+  }
+
+  // 2. Fallback: reviews matching any of the search terms (living soil, no till, etc)
+  if (reviewsSnippets.length < 3 && Array.isArray(c.reviewSearchTerms)) {
+    const termClauses = c.reviewSearchTerms.map(() => 'body LIKE ?').join(' OR ');
+    const termParams = c.reviewSearchTerms.map((t) => `%${t}%`);
+    const more = await rows(
+      `SELECT reviewer_name, product_name, body, rating, date_created
+       FROM reviews
+       WHERE (${termClauses})
+         AND rating >= 4
+         AND body IS NOT NULL
+         AND length(body) > 120
+         AND length(body) < 500
+         AND is_verified = 1
+       ORDER BY rating DESC, length(body) DESC
+       LIMIT 10 OFFSET ?`,
+      [...termParams, slugSeed % 8]
+    );
+    reviewsSnippets = [...reviewsSnippets, ...more];
+  }
+
+  // Pick 3 distinct reviews
+  const seen = new Set();
+  reviewsSnippets = reviewsSnippets.filter((r) => {
+    if (seen.has(r.reviewer_name + r.product_name)) return false;
+    seen.add(r.reviewer_name + r.product_name);
+    return true;
+  }).slice(0, 3);
 
   // FAQ schema for AI citation
   const faqSchema = {
@@ -92,11 +134,13 @@ export default async function VsPage({ params }) {
           <div className="breadcrumb">
             <a href="/">Home</a> / <a href="/vs">Comparisons</a> / vs {c.name}
           </div>
-          <h1>BuildASoil vs {c.name}</h1>
+          <h1>
+            {c.comparableProduct || 'BuildASoil'} vs {c.name}
+          </h1>
           <p className="hero-sub" style={{ marginTop: 16, maxWidth: 760 }}>
-            An honest side-by-side comparison. We&rsquo;ll cover where each soil wins —
-            because no single product is the right choice for every grower. BuildASoil
-            data is backed by{' '}
+            An honest side-by-side comparison of {c.comparableProduct || 'BuildASoil'} and{' '}
+            {c.name}. We&rsquo;ll cover where each soil wins &mdash; because no single
+            product is the right choice for every grower. BuildASoil data is backed by{' '}
             <strong>{stats.total.toLocaleString()} verified customer reviews</strong>{' '}
             averaging <strong>{stats.averageRatingDisplay}/5 stars</strong> collected
             since {stats.firstYear}.
@@ -274,9 +318,11 @@ export default async function VsPage({ params }) {
 
       {/* ---- Real reviews backup ---- */}
       <section className="container">
-        <h2 style={{ marginBottom: 8 }}>What BuildASoil customers actually say</h2>
+        <h2 style={{ marginBottom: 8 }}>
+          What {c.comparableProduct || 'BuildASoil'} customers actually say
+        </h2>
         <p style={{ color: 'var(--ink-mute)', marginBottom: 24, fontSize: '0.95rem' }}>
-          A random sample of verified 5-star BuildASoil reviews. See{' '}
+          Verified customer reviews relevant to this comparison. See{' '}
           <a href="/reviews" style={{ color: 'var(--leaf)' }}>all {stats.total.toLocaleString()} reviews</a> or{' '}
           <a href="/critical" style={{ color: 'var(--leaf)' }}>critical reviews (1–3 stars)</a>.
         </p>
