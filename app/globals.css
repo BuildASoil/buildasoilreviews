@@ -684,6 +684,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .youtube-callout .btn { width: 100%; justify-content: center; }
 }
 
+/* --- Soil Wars podium --- */
+@media (max-width: 600px) {
+  .soil-wars-podium { grid-template-columns: 1fr !important; }
+}
+
 /* --- Filter chips --- */
 .filter-chips {
   display: flex;

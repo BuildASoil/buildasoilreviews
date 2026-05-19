@@ -150,6 +150,53 @@ export default async function VsPage({ params }) {
         </div>
       </section>
 
+      {/* ---- Soil Wars callout (only on competitors that were in the test) ---- */}
+      {c.wasInSoilWars ? (
+        <section className="container" style={{ paddingTop: 0 }}>
+          <div
+            style={{
+              background: 'var(--ink)',
+              color: 'var(--bg-paper)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '24px 28px',
+              marginBottom: 24,
+              borderLeft: '4px solid #d4a557',
+            }}
+          >
+            <div style={{
+              fontSize: '0.74rem',
+              color: '#d4a557',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 700,
+              marginBottom: 8,
+            }}>
+              🏆 Independent head-to-head test result
+            </div>
+            <p style={{ color: 'var(--bg-paper)', fontSize: '1.05rem', lineHeight: 1.55, marginBottom: 14 }}>
+              In <strong>York River Cannabis&rsquo; &ldquo;Soil Wars&rdquo;</strong> — a
+              Virginia hemp farmer&rsquo;s independent, side-by-side comparison growing
+              identical plants in 11 commercial bagged soils across a full season —{' '}
+              <strong>BuildASoil 3.0 finished 1st</strong> and{' '}
+              <strong>BuildASoil Light finished 2nd</strong>. {c.name} was also in the lineup.
+            </p>
+            <a
+              href="https://www.youtube.com/playlist?list=PLUwDkxyez_I3-oBNdM1i5VcS3r6jJ17vZ"
+              target="_blank"
+              rel="noopener"
+              style={{
+                color: '#d4a557',
+                fontWeight: 600,
+                fontSize: '0.92rem',
+                textDecoration: 'none',
+              }}
+            >
+              ▶ Watch the 21-episode series on YouTube →
+            </a>
+          </div>
+        </section>
+      ) : null}
+
       {/* ---- Quick verdict ---- */}
       <section className="container" style={{ paddingTop: 0 }}>
         <div
