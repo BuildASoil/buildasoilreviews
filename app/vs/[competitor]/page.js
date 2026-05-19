@@ -150,8 +150,8 @@ export default async function VsPage({ params }) {
         </div>
       </section>
 
-      {/* ---- Soil Wars callout (only on competitors that were in the test) ---- */}
-      {c.wasInSoilWars ? (
+      {/* ---- Soil Wars / Know Before You Grow callout ---- */}
+      {(c.wasInSoilWars || c.wasIn26BagTest) ? (
         <section className="container" style={{ paddingTop: 0 }}>
           <div
             style={{
@@ -169,19 +169,30 @@ export default async function VsPage({ params }) {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               fontWeight: 700,
-              marginBottom: 8,
+              marginBottom: 10,
             }}>
-              🏆 Independent head-to-head test result
+              🏆 {c.wasInSoilWars && c.wasIn26BagTest ? 'Two independent head-to-head tests' : 'Independent head-to-head test'}
             </div>
-            <p style={{ color: 'var(--bg-paper)', fontSize: '1.05rem', lineHeight: 1.55, marginBottom: 14 }}>
-              In <strong>York River Cannabis&rsquo; &ldquo;Soil Wars&rdquo;</strong> — a
-              Virginia hemp farmer&rsquo;s independent, side-by-side comparison growing
-              identical plants in 11 commercial bagged soils across a full season —{' '}
-              <strong>BuildASoil 3.0 finished 1st</strong> and{' '}
-              <strong>BuildASoil Light finished 2nd</strong>. {c.name} was also in the lineup.
-            </p>
+            {c.wasInSoilWars && c.wasIn26BagTest ? (
+              <p style={{ color: 'var(--bg-paper)', fontSize: '1.05rem', lineHeight: 1.55, marginBottom: 14 }}>
+                <strong>{c.name} was in two separate independent head-to-head soil tests against BuildASoil — and lost both.</strong> In{' '}
+                <a href="https://www.youtube.com/playlist?list=PLUwDkxyez_I3-oBNdM1i5VcS3r6jJ17vZ" target="_blank" rel="noopener" style={{ color: '#d4a557' }}>York River Cannabis&rsquo; &ldquo;Soil Wars&rdquo;</a> (11 soils, full-season video series), BuildASoil 3.0 finished 1st and BuildASoil Light finished 2nd. In{' '}
+                <a href="https://buildasoil.com/pages/why-buildasoil" target="_blank" rel="noopener" style={{ color: '#d4a557' }}>Know Before You Grow&rsquo;s 26-bag retail-purchased test</a>, BuildASoil 3.0 ranked #1 of 26 across lab tests, nutrients, grow-out, and taste.
+              </p>
+            ) : c.wasInSoilWars ? (
+              <p style={{ color: 'var(--bg-paper)', fontSize: '1.05rem', lineHeight: 1.55, marginBottom: 14 }}>
+                In <strong>York River Cannabis&rsquo; &ldquo;Soil Wars&rdquo;</strong> — a Virginia hemp farmer&rsquo;s independent side-by-side comparison growing identical plants in 11 commercial bagged soils across a full season —{' '}
+                <strong>BuildASoil 3.0 finished 1st</strong> and{' '}
+                <strong>BuildASoil Light finished 2nd</strong>. {c.name} was also in the lineup.
+              </p>
+            ) : (
+              <p style={{ color: 'var(--bg-paper)', fontSize: '1.05rem', lineHeight: 1.55, marginBottom: 14 }}>
+                In <strong>Know Before You Grow&rsquo;s 26-bag soil ranking</strong> — an independent reviewer testing 26 bagged soils purchased at retail across 4 scoring categories including lab tests —{' '}
+                <strong>BuildASoil 3.0 ranked #1 of 26</strong>. {c.name} was also in the lineup.
+              </p>
+            )}
             <a
-              href="https://www.youtube.com/playlist?list=PLUwDkxyez_I3-oBNdM1i5VcS3r6jJ17vZ"
+              href={c.wasInSoilWars ? "https://www.youtube.com/playlist?list=PLUwDkxyez_I3-oBNdM1i5VcS3r6jJ17vZ" : "https://buildasoil.com/pages/why-buildasoil"}
               target="_blank"
               rel="noopener"
               style={{
@@ -191,7 +202,7 @@ export default async function VsPage({ params }) {
                 textDecoration: 'none',
               }}
             >
-              ▶ Watch the 21-episode series on YouTube →
+              ▶ See the proof →
             </a>
           </div>
         </section>

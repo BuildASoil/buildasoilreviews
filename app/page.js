@@ -8,7 +8,7 @@ import PhotoGallery from './_components/photo-gallery';
 import ReviewPhotos from './_components/review-photos';
 import RedditSection from './_components/reddit-section';
 import YouTubeCallout from './_components/youtube-callout';
-import SoilWarsSection from './_components/soil-wars-section';
+import IndependentTestsSection from './_components/independent-tests-section';
 
 function StarString({ rating }) {
   const full = Math.round(rating);
@@ -245,8 +245,8 @@ export default async function HomePage() {
       {/* ---- Real customer photos ---- */}
       <PhotoGallery count={12} />
 
-      {/* ---- Soil Wars independent test ---- */}
-      <SoilWarsSection />
+      {/* ---- Independent head-to-head tests ---- */}
+      <IndependentTestsSection />
 
       {/* ---- Reddit independent discussion ---- */}
       <RedditSection />

@@ -684,9 +684,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .youtube-callout .btn { width: 100%; justify-content: center; }
 }
 
-/* --- Soil Wars podium --- */
-@media (max-width: 600px) {
+/* --- Soil Wars / Independent tests --- */
+@media (max-width: 720px) {
   .soil-wars-podium { grid-template-columns: 1fr !important; }
+  .independent-tests-grid { grid-template-columns: 1fr !important; }
 }
 
 /* --- Filter chips --- */
